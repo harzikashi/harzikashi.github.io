@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>我的單頁式網站</title>
+
+  <!-- Bootstrap 4.6.2 -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+  >
+
+  <style>
+    /* 全站基本設定 */
+    html {
+      scroll-behavior: auto;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, "Noto Sans TC", sans-serif;
+      color: #343A40;
+    }
+
+    /* 首頁 Banner */
+    .home-banner {
+      height: 250px;
+      background-color: #4F9D9A;
+      color: #FFFFFF;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      text-align: center;
+    }
+
+    .home-banner h1 {
+      margin: 0;
+    }
+
+    /* 導覽列 */
+    .main-nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+
+      background-color: #E9ECEF;
+      padding: 8px 16px;
+    }
+
+    .main-nav .navbar-nav {
+      gap: 8px;
+    }
+
+    .main-nav .nav-link {
+      color: #343A40;
+      padding: 10px 18px;
+      border-radius: 6px;
+
+      transition:
+        background-color 0.25s ease,
+        color 0.25s ease,
+        box-shadow 0.25s ease;
+    }
+
+    /* Hover 效果 */
+    .main-nav .nav-link:hover {
+      background-color: #4F9D9A;
+      color: #FFFFFF;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Active 效果 */
+    .main-nav .nav-link.active {
+      background-color: #367C79;
+      color: #FFFFFF;
+      font-weight: bold;
+    }
+
+    /* Section Banner：保留第四輪設定 */
+    .section-banner {
+      height: 100vh;
+
+      background-color: #E76F51;
+      color: #FFFFFF;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .section-banner h2 {
+      margin: 0;
+    }
+
+    /* 內容區：保留第四輪設定 */
+    .content-area {
+      background-color: #F2F2F2;
+      min-height: calc(200vh - 8rem);
+      padding: 2rem 0;
+    }
+
+    /* 中央內容卡片：保留第四輪設定 */
+    .content-card {
+      background-color: #FFFFFF;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+      width: 100%;
+      height: 100%;
+    }
+
+    .content-card h3 {
+      margin-bottom: 24px;
+    }
+
+    .content-card p {
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+
+    .content-card p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* 平板與手機版 RWD：保留第四輪設定 */
+    @media (max-width: 767.98px) {
+      .main-nav {
+        padding: 6px 8px;
+      }
+
+      .main-nav .navbar-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 4px;
+      }
+
+      .main-nav .nav-link {
+        padding: 8px 12px;
+      }
+
+      .section-banner {
+        padding: 32px 16px;
+      }
+
+      .content-area {
+        padding: 40px 0;
+      }
+
+      .content-card {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 首頁 Banner -->
+  <header class="home-banner" id="home">
+    <h1>這裡是Banner</h1>
+  </header>
+
+  <!-- 導覽列 -->
+  <nav class="navbar navbar-expand-md main-nav">
+    <div class="container-fluid">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="#home" data-target="home">首頁</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#section1" data-target="section1">區段1</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#section2" data-target="section2">區段2</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#section3" data-target="section3">區段3</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Section 1 -->
+  <section id="section1">
+
+    <div class="container-fluid section-banner">
+      <h2>區段1 Banner</h2>
+    </div>
+
+    <div class="content-area">
+      <div class="container">
+        <div class="row">
+
+          <div class="d-none d-md-block col-md-2"></div>
+
+          <div class="col-12 col-md-8">
+            <div class="content-card">
+              <h3>區段1內容標題</h3>
+
+              <p>
+                這是區段1的第一段文字，用來介紹本區段的主題。
+              </p>
+
+              <p>
+                這是區段1的第二段文字，用來補充相關資訊與內容。
+              </p>
+
+              <hr>
+
+              <h4>從想法到主題</h4>
+              <p>
+                每一個好的網頁，都可以從一個值得分享的想法開始。
+                在設計之前，先思考希望傳達什麼訊息，以及希望讀者
+                看完之後留下什麼印象。
+              </p>
+
+              <h4>設計前的三個問題</h4>
+              <ul>
+                <li>這個網頁主要想介紹什麼？</li>
+                <li>目標讀者是誰？</li>
+                <li>希望讀者從中獲得什麼資訊？</li>
+              </ul>
+
+              <p>
+                當主題與目標清楚後，就能更有方向地安排網頁內容，
+                讓每個區塊都發揮自己的作用。
+              </p>
+            </div>
+          </div>
+
+          <div class="d-none d-md-block col-md-2"></div>
+
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Section 2 -->
+  <section id="section2">
+
+    <div class="container-fluid section-banner">
+      <h2>區段2 Banner</h2>
+    </div>
+
+    <div class="content-area">
+      <div class="container">
+        <div class="row">
+
+          <div class="d-none d-md-block col-md-2"></div>
+
+          <div class="col-12 col-md-8">
+            <div class="content-card">
+              <h3>區段2內容標題</h3>
+
+              <p>
+                這是區段2的第一段文字，用來介紹本區段的主題。
+              </p>
+
+              <p>
+                這是區段2的第二段文字，用來補充相關資訊與內容。
+              </p>
+
+              <hr>
+
+              <h4>版面配置的重要性</h4>
+              <p>
+                網頁設計不只是將文字與圖片放在一起，更需要透過
+                版面安排，建立清楚的閱讀順序。適當的留白、對齊
+                與區塊比例，都能幫助讀者更快找到重要資訊。
+              </p>
+
+              <h4>常見的版面元素</h4>
+              <ul>
+                <li><strong>Banner：</strong>呈現頁面或區段的主要標題。</li>
+                <li><strong>Content area：</strong>提供內容閱讀的背景區域。</li>
+                <li><strong>Content card：</strong>集中呈現相關文字與資訊。</li>
+                <li><strong>Navigation：</strong>協助讀者在不同區段之間移動。</li>
+              </ul>
+
+              <p>
+                當這些元素彼此配合時，網頁就能在保持整體一致性的
+                同時，讓不同內容擁有清楚的層次。
+              </p>
+            </div>
+          </div>
+
+          <div class="d-none d-md-block col-md-2"></div>
+
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Section 3 -->
+  <section id="section3">
+
+    <div class="container-fluid section-banner">
+      <h2>區段3 Banner</h2>
+    </div>
+
+    <div class="content-area">
+      <div class="container">
+        <div class="row">
+
+          <div class="d-none d-md-block col-md-2"></div>
+
+          <div class="col-12 col-md-8">
+            <div class="content-card">
+              <h3>區段3內容標題</h3>
+
+              <p>
+                這是區段3的第一段文字，用來介紹本區段的主題。
+              </p>
+
+              <p>
+                這是區段3的第二段文字，用來補充相關資訊與內容。
+              </p>
+
+              <hr>
+
+              <h4>讓內容更容易閱讀</h4>
+              <p>
+                好的網頁內容除了資訊正確，也應該讓讀者容易理解。
+                將較長的文字分成段落，搭配清楚的小標題與條列清單，
+                能讓讀者快速掌握每個部分的重點。
+              </p>
+
+              <h4>提升閱讀體驗的小技巧</h4>
+              <ul>
+                <li>使用簡潔明確的小標題。</li>
+                <li>每個段落集中說明一個重點。</li>
+                <li>適度使用條列清單整理資訊。</li>
+                <li>保持文字與背景之間足夠的對比。</li>
+              </ul>
+
+              <h4>持續測試與調整</h4>
+              <p>
+                網頁完成後，可以在不同螢幕尺寸下檢查文字、
+                卡片與導覽列的呈現方式。透過實際瀏覽與反覆測試，
+                才能確認設計是否符合原本的目標。
+              </p>
+
+              <p>
+                網頁設計是一個持續改善的過程。每一次調整，
+                都能讓資訊的呈現更加清楚，也讓使用者擁有更好的體驗。
+              </p>
+            </div>
+          </div>
+
+          <div class="d-none d-md-block col-md-2"></div>
+
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- JavaScript：保留既有功能 -->
+  <script>
+    const navLinks = Array.from(
+      document.querySelectorAll('.main-nav .nav-link')
+    );
+
+    const sections = navLinks
+      .map(link => document.getElementById(link.dataset.target))
+      .filter(Boolean);
+
+    let animationFrameId = null;
+    let isAnimating = false;
+
+    /* 取得置頂導覽列高度 */
+    function getNavHeight() {
+      const nav = document.querySelector('.main-nav');
+      return nav ? nav.getBoundingClientRect().height : 0;
+    }
+
+    /* 計算目標捲動位置，避免標題被導覽列遮住 */
+    function getTargetPosition(target) {
+      if (!target || target.id === 'home') {
+        return 0;
+      }
+
+      const targetTop =
+        target.getBoundingClientRect().top + window.scrollY;
+
+      return Math.max(0, targetTop - getNavHeight());
+    }
+
+    /* 更新 Active 導覽列狀態 */
+    function setActiveLink(targetId) {
+      navLinks.forEach(link => {
+        const isActive = link.dataset.target === targetId;
+
+        link.classList.toggle('active', isActive);
+
+        if (isActive) {
+          link.setAttribute('aria-current', 'location');
+        } else {
+          link.removeAttribute('aria-current');
+        }
+      });
+    }
+
+    /* 取消正在進行的平順滑動 */
+    function cancelSmoothScroll() {
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+
+      isAnimating = false;
+    }
+
+    /* 自訂平順滑動 */
+    function smoothScrollTo(targetPosition, duration = 700) {
+      cancelSmoothScroll();
+
+      const startPosition = window.scrollY;
+      const distance = targetPosition - startPosition;
+      const startTime = performance.now();
+
+      if (Math.abs(distance) < 1) {
+        window.scrollTo(0, targetPosition);
+        return;
+      }
+
+      isAnimating = true;
+
+      function animate(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        /* easeInOutCubic */
+        const easedProgress =
+          progress < 0.5
+            ? 4 * progress * progress * progress
+            : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+        window.scrollTo(
+          0,
+          startPosition + distance * easedProgress
+        );
+
+        if (progress < 1) {
+          animationFrameId = requestAnimationFrame(animate);
+        } else {
+          window.scrollTo(0, targetPosition);
+          animationFrameId = null;
+          isAnimating = false;
+          updateActiveOnScroll();
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(animate);
+    }
+
+    /* 點擊導覽列 */
+    navLinks.forEach(link => {
+      link.addEventListener('click', event => {
+        event.preventDefault();
+
+        const targetId = link.dataset.target;
+        const target = document.getElementById(targetId);
+
+        if (!target) return;
+
+        setActiveLink(targetId);
+
+        const targetPosition = getTargetPosition(target);
+
+        smoothScrollTo(targetPosition);
+
+        if (window.location.hash !== `#${targetId}`) {
+          history.pushState(null, '', `#${targetId}`);
+        }
+      });
+    });
+
+    /* 根據目前捲動位置判斷 Active 區段 */
+    function updateActiveOnScroll() {
+      if (isAnimating) return;
+
+      const scrollPosition = window.scrollY;
+      const navHeight = getNavHeight();
+
+      /* 回到頁面頂端時，首頁為 Active */
+      if (scrollPosition <= 5) {
+        setActiveLink('home');
+        return;
+      }
+
+      let currentSectionId = 'home';
+
+      sections.forEach(section => {
+        if (section.id === 'home') return;
+
+        const sectionTop =
+          section.getBoundingClientRect().top + window.scrollY;
+
+        if (scrollPosition + navHeight + 2 >= sectionTop) {
+          currentSectionId = section.id;
+        }
+      });
+
+      setActiveLink(currentSectionId);
+    }
+
+    /* 監聽捲動 */
+    window.addEventListener('scroll', updateActiveOnScroll, {
+      passive: true
+    });
+
+    /* 瀏覽器上一頁、下一頁 */
+    window.addEventListener('popstate', () => {
+      const targetId = window.location.hash.slice(1) || 'home';
+      const target = document.getElementById(targetId);
+
+      if (!target) return;
+
+      setActiveLink(targetId);
+      smoothScrollTo(getTargetPosition(target));
+    });
+
+    /* 視窗大小改變時，重新判斷目前區段 */
+    window.addEventListener('resize', () => {
+      updateActiveOnScroll();
+    });
+
+    /* 載入時支援網址中的區段錨點 */
+    window.addEventListener('load', () => {
+      const targetId = window.location.hash.slice(1);
+
+      if (targetId) {
+        const target = document.getElementById(targetId);
+
+        if (target) {
+          setActiveLink(targetId);
+
+          requestAnimationFrame(() => {
+            window.scrollTo(0, getTargetPosition(target));
+          });
+
+          return;
+        }
+      }
+
+      updateActiveOnScroll();
+    });
+  </script>
+
+</body>
+</html>
