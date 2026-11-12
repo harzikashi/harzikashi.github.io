@@ -8,157 +8,410 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   html, body {
+    width: 100%;
     height: 100%;
-    overflow: hidden;            /* 關閉原生捲動，改由 jQuery 控制 */
-    font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
+    overflow: hidden;              /* 停用原生捲動，全部由 JS 控制 */
+    overscroll-behavior: none;
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+    color: #fff;
+    background: #111;
+  }
+
+  /* 視窗容器 */
+  .viewport {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  /* 所有頁面的包裹層，透過 transform 移動 */
+  .wrapper {
+    will-change: transform;
   }
 
   .page {
-    height: 100vh;
+    position: relative;
+    width: 100%;
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 8vw;
+  }
+
+  .page h1 {
+    font-size: clamp(2.4rem, 6vw, 5rem);
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+  }
+  .page p {
+    font-size: clamp(1rem, 1.6vw, 1.25rem);
+    line-height: 1.8;
+    opacity: 0.9;
+    max-width: 640px;
+  }
+  .page .num {
+    font-size: 0.9rem;
+    letter-spacing: 0.4em;
+    opacity: 0.7;
+    margin-bottom: 0.8rem;
+  }
+
+  .p1 { background: linear-gradient(135deg, #1e3c72, #2a5298); }
+  .p2 { background: linear-gradient(135deg, #614385, #516395); }
+  .p3 { background: linear-gradient(180deg, #0f9b8e 0%, #134e5e 50%, #0b2b33 100%); justify-content: flex-start; }
+  .p4 { background: linear-gradient(135deg, #c94b4b, #4b134f); }
+  .p5 { background: linear-gradient(135deg, #f7971e, #c0392b); }
+
+  /* 第三頁：長頁內容 */
+  .p3 .block {
+    width: 100%;
+    max-width: 760px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    color: #fff;
-    font-size: 48px;
-    font-weight: bold;
+    border-bottom: 1px dashed rgba(255,255,255,0.2);
+  }
+  .p3 .block:last-child { border-bottom: none; }
+  .p3 .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    width: 100%;
+    margin-top: 24px;
+  }
+  .p3 .card {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 14px;
+    padding: 22px 18px;
+    text-align: left;
+    backdrop-filter: blur(4px);
+  }
+  .p3 .card h3 { margin-bottom: 8px; font-size: 1.1rem; }
+  .p3 .card p { font-size: 0.95rem; }
+
+  /* 提示箭頭 */
+  .hint {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.85rem;
+    opacity: 0.75;
+    animation: bounce 1.6s infinite;
+    pointer-events: none;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translate(-50%, 0); }
+    50%      { transform: translate(-50%, 8px); }
   }
 
-  #page1 { background: #e74c3c; }
-  #page2 { background: #f39c12; }
-  #page4 { background: #27ae60; }
-  #page5 { background: #8e44ad; }
-
-  /* 第三頁：200vh 長頁面 */
-  #page3 {
-    height: 200vh;
-    flex-direction: column;
-    justify-content: space-between;
-    background: linear-gradient(to bottom, #2980b9, #1abc9c);
-    padding: 40vh 0;
-  }
-  #page3 p {
-    font-size: 20px;
-    font-weight: normal;
-    opacity: 0.85;
-    margin-top: 12px;
-    text-align: center;
-  }
-
-  /* 右側頁面指示點 */
-  #dots {
+  /* 右側導覽圓點 */
+  .dots {
     position: fixed;
     right: 24px;
     top: 50%;
     transform: translateY(-50%);
-    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    z-index: 10;
   }
-  #dots li {
+  .dots button {
     width: 12px;
     height: 12px;
-    margin: 12px 0;
     border-radius: 50%;
     border: 2px solid #fff;
-    transition: background 0.3s;
+    background: transparent;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: all 0.3s;
+    padding: 0;
   }
-  #dots li.active { background: #fff; }
+  .dots button.long { height: 28px; border-radius: 8px; }
+  .dots button.active { background: #fff; opacity: 1; transform: scale(1.15); }
+
+  /* 第三頁的閱讀進度條 */
+  .progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 4px;
+    width: 0;
+    background: #7fffd4;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .progress.show { opacity: 1; }
 </style>
 </head>
 <body>
 
-  <div class="page" id="page1">第一頁</div>
-  <div class="page" id="page2">第二頁</div>
-  <div class="page" id="page3">
-    <div>第三頁（上半部）<p>這是 200vh 的長頁面，繼續向下滾動可在頁面內自由瀏覽</p></div>
-    <div>第三頁（下半部）<p>已到第三頁底部，再向下滾動將切換至第四頁</p></div>
+<div class="progress" id="progress"></div>
+
+<nav class="dots" id="dots"></nav>
+
+<div class="viewport">
+  <div class="wrapper" id="wrapper">
+
+    <section class="page p1" data-height="1">
+      <div class="num">PAGE 01</div>
+      <h1>歡迎</h1>
+      <p>使用滑鼠滾輪、方向鍵或觸控滑動來切換頁面。</p>
+      <div class="hint">↓ 向下滑動</div>
+    </section>
+
+    <section class="page p2" data-height="1">
+      <div class="num">PAGE 02</div>
+      <h1>第二頁</h1>
+      <p>一般頁面每次滑動都會完整切換到上一頁或下一頁。</p>
+      <div class="hint">↓ 下一頁是長頁面</div>
+    </section>
+
+    <!-- 第三頁：高度為其他頁的 2 倍 -->
+    <section class="page p3" data-height="2">
+      <div class="block">
+        <div class="num">PAGE 03 · TOP</div>
+        <h1>第三頁（長頁面）</h1>
+        <p>這一頁的高度是一般頁面的兩倍。在這裡可以自由上下捲動，捲到底部後再往下滑才會進入第四頁；捲到頂部後再往上滑才會回到第二頁。</p>
+      </div>
+      <div class="block">
+        <h1>自由捲動區</h1>
+        <div class="cards">
+          <div class="card"><h3>平滑捲動</h3><p>頁內捲動帶有緩動效果，手感接近原生捲動。</p></div>
+          <div class="card"><h3>邊界停頓</h3><p>捲到邊界時會先停住，需要再滑一次才會換頁，避免慣性誤觸。</p></div>
+          <div class="card"><h3>從下方返回</h3><p>由第四頁往上回來時，會直接停在本頁底部。</p></div>
+        </div>
+      </div>
+      <div class="block">
+        <div class="num">PAGE 03 · BOTTOM</div>
+        <h1>已到底部</h1>
+        <p>再向下滑動一次即可進入第四頁。</p>
+      </div>
+    </section>
+
+    <section class="page p4" data-height="1">
+      <div class="num">PAGE 04</div>
+      <h1>第四頁</h1>
+      <p>往上滑動會先回到第三頁的底部，然後可以繼續往上自由捲動。</p>
+    </section>
+
+    <section class="page p5" data-height="1">
+      <div class="num">PAGE 05</div>
+      <h1>最後一頁</h1>
+      <p>感謝瀏覽！</p>
+    </section>
+
   </div>
-  <div class="page" id="page4">第四頁</div>
-  <div class="page" id="page5">第五頁</div>
+</div>
 
-  <ul id="dots">
-    <li class="active"></li><li></li><li></li><li></li><li></li>
-  </ul>
-
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
-$(function () {
-  var $pages   = $('.page');
-  var total    = $pages.length;
-  var current  = 0;          // 目前頁面索引（0 ~ 4）
-  var locked   = false;      // 動畫進行中鎖定，確保一次只切換一頁
-  var LONG     = 2;          // 第三頁的索引
+(() => {
+  const wrapper  = document.getElementById('wrapper');
+  const pages    = Array.from(document.querySelectorAll('.page'));
+  const dotsEl   = document.getElementById('dots');
+  const progress = document.getElementById('progress');
 
-  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-  $('html, body').scrollTop(0);
+  // ===== 可調整參數 =====
+  const PAGE_DURATION = 800;   // 整頁切換動畫時間 (ms)
+  const LERP          = 0.16;  // 頁內捲動的平滑係數 (0~1，越大越跟手)
+  const GESTURE_GAP   = 180;   // 兩次滾輪事件間隔超過此值，視為「新的一次滑動」(ms)
+  const MIN_DELTA     = 4;     // 太小的滾輪量不觸發換頁（過濾抖動）
 
-  function vh()          { return $(window).height(); }
-  function scrollPos()   { return $(window).scrollTop(); }
-  function pageTop(i)    { return $pages.eq(i).offset().top; }
-  // 第三頁可捲動的最底位置（頁面底部對齊視窗底部）
-  function longBottom()  { return pageTop(LONG) + $pages.eq(LONG).outerHeight() - vh(); }
+  // ===== 狀態 =====
+  let vh = 0;
+  let tops = [];        // 每頁頂端位置
+  let heights = [];     // 每頁高度
+  let index = 0;        // 目前頁面
+  let current = 0;      // 畫面實際位置
+  let target = 0;       // 目標位置
+  let tween = null;     // 整頁切換動畫
+  let lastWheel = 0;
+  let needFresh = false; // 需要「新的一次滑動」才能再觸發動作（吃掉觸控板慣性）
 
-  function updateDots() {
-    $('#dots li').removeClass('active').eq(current).addClass('active');
-  }
-
-  // 切換到指定頁面
-  function goTo(index, dir) {
-    if (index < 0 || index >= total || index === current) return;
-    locked = true;
-
-    // 從第四頁往上回到第三頁時，停在第三頁底部
-    var target = (index === LONG && dir < 0) ? longBottom() : pageTop(index);
-
-    current = index;
-    updateDots();
-
-    $('html, body').stop().animate({ scrollTop: target }, 700).promise().done(function () {
-      setTimeout(function () { locked = false; }, 400); // 避免觸控板慣性連續切頁
+  // ===== 版面計算 =====
+  function layout() {
+    vh = window.innerHeight;
+    let t = 0;
+    pages.forEach((p, i) => {
+      const h = vh * (parseFloat(p.dataset.height) || 1);
+      p.style.height = h + 'px';
+      heights[i] = h;
+      tops[i] = t;
+      t += h;
     });
   }
 
-  // 第三頁內部的一般捲動
-  function scrollInside(delta) {
-    var top = pageTop(LONG), bottom = longBottom();
-    var next = Math.min(Math.max(scrollPos() + delta, top), bottom);
-    $('html, body').scrollTop(next);
+  const isLong   = i => heights[i] > vh + 1;
+  const minPos   = i => tops[i];
+  const maxPos   = i => tops[i] + heights[i] - vh;
 
-    // 到達第三頁頂端或底端時稍微停頓，避免慣性直接衝到下一頁
-    if (next === top || next === bottom) {
-      locked = true;
-      setTimeout(function () { locked = false; }, 500);
-    }
+  // ===== 導覽圓點 =====
+  pages.forEach((p, i) => {
+    const b = document.createElement('button');
+    b.setAttribute('aria-label', '前往第 ' + (i + 1) + ' 頁');
+    if (p.dataset.height > 1) b.classList.add('long');
+    b.addEventListener('click', () => { if (!tween && i !== index) goTo(i, false); });
+    dotsEl.appendChild(b);
+  });
+  function updateDots() {
+    dotsEl.querySelectorAll('button').forEach((b, i) => b.classList.toggle('active', i === index));
   }
 
-  $(window).on('wheel', function (e) {
-    if (locked) return;
+  // ===== 換頁 =====
+  function goTo(i, atBottom) {
+    index = i;
+    target = atBottom ? maxPos(i) : minPos(i);
+    tween = { from: current, to: target, start: performance.now() };
+    updateDots();
+  }
+  function next() {
+    if (index < pages.length - 1) goTo(index + 1, false);
+  }
+  function prev() {
+    // 往上進入長頁面時，停在該頁底部
+    if (index > 0) goTo(index - 1, isLong(index - 1));
+  }
 
-    var oe = e.originalEvent;
-    var delta = oe.deltaY;
-    if (oe.deltaMode === 1) delta *= 40;    // Firefox 以「行」為單位
-    if (delta === 0) return;
+  // ===== 處理一次捲動量 =====
+  function handleDelta(dy) {
+    if (tween) return;
 
-    var dir = delta > 0 ? 1 : -1;
-
-    // 位於第三頁，且尚未捲到頂端/底端 → 在頁內一般捲動
-    if (current === LONG) {
-      var st = scrollPos();
-      if (dir > 0 && st < longBottom() - 1)   { scrollInside(delta); return; }
-      if (dir < 0 && st > pageTop(LONG) + 1)  { scrollInside(delta); return; }
+    if (isLong(index)) {
+      const min = minPos(index), max = maxPos(index);
+      if (dy > 0) {
+        if (target < max - 0.5) {
+          target = Math.min(target + dy, max);
+          if (target >= max) needFresh = true;   // 抵達底部：停住，等下一次滑動
+          return;
+        }
+      } else if (dy < 0) {
+        if (target > min + 0.5) {
+          target = Math.max(target + dy, min);
+          if (target <= min) needFresh = true;   // 抵達頂部：停住，等下一次滑動
+          return;
+        }
+      }
     }
 
-    goTo(current + dir, dir);
+    if (Math.abs(dy) < MIN_DELTA) return;
+    dy > 0 ? next() : prev();
+  }
+
+  // ===== 滑鼠滾輪 / 觸控板 =====
+  window.addEventListener('wheel', e => {
+    e.preventDefault();
+    const now = performance.now();
+    const gap = now - lastWheel;
+    lastWheel = now;
+
+    if (tween) return;
+    if (needFresh) {
+      if (gap < GESTURE_GAP) return;   // 仍是同一次滑動（或慣性），忽略
+      needFresh = false;
+    }
+
+    let dy = e.deltaY;
+    if (e.deltaMode === 1) dy *= 16;        // 以「行」為單位
+    else if (e.deltaMode === 2) dy *= vh;   // 以「頁」為單位
+    handleDelta(dy);
+  }, { passive: false });
+
+  // ===== 鍵盤 =====
+  window.addEventListener('keydown', e => {
+    if (tween) return;
+    const step = isLong(index) ? 120 : 1;
+    const big  = isLong(index) ? vh * 0.85 : 1;
+    switch (e.key) {
+      case 'ArrowDown':            handleDelta(step);  break;
+      case 'ArrowUp':              handleDelta(-step); break;
+      case 'PageDown': case ' ':   handleDelta(e.shiftKey ? -big : big); break;
+      case 'PageUp':               handleDelta(-big);  break;
+      case 'Home': if (index !== 0) goTo(0, false); break;
+      case 'End':  if (index !== pages.length - 1) goTo(pages.length - 1, false); break;
+      default: return;
+    }
+    needFresh = false;
+    e.preventDefault();
   });
 
-  // 視窗大小改變時重新對齊目前頁面
-  $(window).on('resize', function () {
-    if (current === LONG) {
-      var st = Math.min(Math.max(scrollPos(), pageTop(LONG)), longBottom());
-      $('html, body').scrollTop(st);
+  // ===== 觸控 =====
+  let touchStartY = 0, touchLastY = 0, movedFreely = false;
+  window.addEventListener('touchstart', e => {
+    touchStartY = touchLastY = e.touches[0].clientY;
+    movedFreely = false;
+  }, { passive: true });
+
+  window.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (tween) return;
+    const y = e.touches[0].clientY;
+    const dy = touchLastY - y;
+    touchLastY = y;
+    if (isLong(index)) {
+      const nt = Math.min(Math.max(target + dy, minPos(index)), maxPos(index));
+      if (nt !== target) {
+        target = current = nt;   // 手指拖曳時直接跟隨
+        movedFreely = true;
+      }
+    }
+  }, { passive: false });
+
+  window.addEventListener('touchend', () => {
+    if (tween || movedFreely) return;   // 本次觸控有在長頁內捲動，就不換頁
+    const total = touchStartY - touchLastY;
+    if (Math.abs(total) > 50) total > 0 ? next() : prev();
+  });
+
+  // ===== 動畫迴圈 =====
+  const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; // easeInOutCubic
+
+  function frame(now) {
+    if (tween) {
+      const p = Math.min((now - tween.start) / PAGE_DURATION, 1);
+      current = tween.from + (tween.to - tween.from) * ease(p);
+      if (p >= 1) {
+        current = target = tween.to;
+        tween = null;
+        needFresh = true;   // 換頁後需要新的一次滑動，避免慣性連續跳頁
+      }
     } else {
-      $('html, body').scrollTop(pageTop(current));
+      const diff = target - current;
+      current = Math.abs(diff) < 0.3 ? target : current + diff * LERP;
     }
+
+    wrapper.style.transform = `translate3d(0, ${-current}px, 0)`;
+
+    // 第三頁進度條
+    const longIdx = pages.findIndex((_, i) => isLong(i));
+    if (longIdx >= 0 && index === longIdx && !tween) {
+      const ratio = (current - minPos(longIdx)) / (maxPos(longIdx) - minPos(longIdx));
+      progress.style.width = (Math.min(Math.max(ratio, 0), 1) * 100) + '%';
+      progress.classList.add('show');
+    } else {
+      progress.classList.remove('show');
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  // ===== 視窗大小改變 =====
+  window.addEventListener('resize', () => {
+    const offset = current - tops[index];
+    layout();
+    tween = null;
+    target = current = Math.min(Math.max(tops[index] + offset, minPos(index)), maxPos(index));
   });
-});
+
+  layout();
+  updateDots();
+  requestAnimationFrame(frame);
+})();
 </script>
 </body>
 </html>
