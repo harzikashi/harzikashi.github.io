@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>垂直滑頁效果</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;            /* 關閉原生捲動，改由 jQuery 控制 */
+    font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
+  }
+
+  .page {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 48px;
+    font-weight: bold;
+  }
+
+  #page1 { background: #e74c3c; }
+  #page2 { background: #f39c12; }
+  #page4 { background: #27ae60; }
+  #page5 { background: #8e44ad; }
+
+  /* 第三頁：200vh 長頁面 */
+  #page3 {
+    height: 200vh;
+    flex-direction: column;
+    justify-content: space-between;
+    background: linear-gradient(to bottom, #2980b9, #1abc9c);
+    padding: 40vh 0;
+  }
+  #page3 p {
+    font-size: 20px;
+    font-weight: normal;
+    opacity: 0.85;
+    margin-top: 12px;
+    text-align: center;
+  }
+
+  /* 右側頁面指示點 */
+  #dots {
+    position: fixed;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    list-style: none;
+  }
+  #dots li {
+    width: 12px;
+    height: 12px;
+    margin: 12px 0;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    transition: background 0.3s;
+  }
+  #dots li.active { background: #fff; }
+</style>
+</head>
+<body>
+
+  <div class="page" id="page1">第一頁</div>
+  <div class="page" id="page2">第二頁</div>
+  <div class="page" id="page3">
+    <div>第三頁（上半部）<p>這是 200vh 的長頁面，繼續向下滾動可在頁面內自由瀏覽</p></div>
+    <div>第三頁（下半部）<p>已到第三頁底部，再向下滾動將切換至第四頁</p></div>
+  </div>
+  <div class="page" id="page4">第四頁</div>
+  <div class="page" id="page5">第五頁</div>
+
+  <ul id="dots">
+    <li class="active"></li><li></li><li></li><li></li><li></li>
+  </ul>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+$(function () {
+  var $pages   = $('.page');
+  var total    = $pages.length;
+  var current  = 0;          // 目前頁面索引（0 ~ 4）
+  var locked   = false;      // 動畫進行中鎖定，確保一次只切換一頁
+  var LONG     = 2;          // 第三頁的索引
+
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  $('html, body').scrollTop(0);
+
+  function vh()          { return $(window).height(); }
+  function scrollPos()   { return $(window).scrollTop(); }
+  function pageTop(i)    { return $pages.eq(i).offset().top; }
+  // 第三頁可捲動的最底位置（頁面底部對齊視窗底部）
+  function longBottom()  { return pageTop(LONG) + $pages.eq(LONG).outerHeight() - vh(); }
+
+  function updateDots() {
+    $('#dots li').removeClass('active').eq(current).addClass('active');
+  }
+
+  // 切換到指定頁面
+  function goTo(index, dir) {
+    if (index < 0 || index >= total || index === current) return;
+    locked = true;
+
+    // 從第四頁往上回到第三頁時，停在第三頁底部
+    var target = (index === LONG && dir < 0) ? longBottom() : pageTop(index);
+
+    current = index;
+    updateDots();
+
+    $('html, body').stop().animate({ scrollTop: target }, 700).promise().done(function () {
+      setTimeout(function () { locked = false; }, 400); // 避免觸控板慣性連續切頁
+    });
+  }
+
+  // 第三頁內部的一般捲動
+  function scrollInside(delta) {
+    var top = pageTop(LONG), bottom = longBottom();
+    var next = Math.min(Math.max(scrollPos() + delta, top), bottom);
+    $('html, body').scrollTop(next);
+
+    // 到達第三頁頂端或底端時稍微停頓，避免慣性直接衝到下一頁
+    if (next === top || next === bottom) {
+      locked = true;
+      setTimeout(function () { locked = false; }, 500);
+    }
+  }
+
+  $(window).on('wheel', function (e) {
+    if (locked) return;
+
+    var oe = e.originalEvent;
+    var delta = oe.deltaY;
+    if (oe.deltaMode === 1) delta *= 40;    // Firefox 以「行」為單位
+    if (delta === 0) return;
+
+    var dir = delta > 0 ? 1 : -1;
+
+    // 位於第三頁，且尚未捲到頂端/底端 → 在頁內一般捲動
+    if (current === LONG) {
+      var st = scrollPos();
+      if (dir > 0 && st < longBottom() - 1)   { scrollInside(delta); return; }
+      if (dir < 0 && st > pageTop(LONG) + 1)  { scrollInside(delta); return; }
+    }
+
+    goTo(current + dir, dir);
+  });
+
+  // 視窗大小改變時重新對齊目前頁面
+  $(window).on('resize', function () {
+    if (current === LONG) {
+      var st = Math.min(Math.max(scrollPos(), pageTop(LONG)), longBottom());
+      $('html, body').scrollTop(st);
+    } else {
+      $('html, body').scrollTop(pageTop(current));
+    }
+  });
+});
+</script>
+</body>
+</html>
